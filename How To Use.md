@@ -1,9 +1,3 @@
-Here is the complete, exhaustive user manual for **Cipher Stream XDCC**. It covers everything from IRC basics and NickServ security to network setup, database searching, active transfer management, and API integration.
-
-You can easily save this document as a professional PDF by copying the text into a document editor (like Microsoft Word, Google Docs, or Notion) and clicking **File > Export as PDF** (or **Print > Save as PDF**).
-
----
-
 # Cipher Stream XDCC: Complete User Manual & Guide
 
 ## 1. Introduction: Understanding IRC, XDCC, and NickServ
