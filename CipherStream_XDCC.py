@@ -28,7 +28,7 @@ ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")
 
 # --- App Version ---
-CURRENT_VERSION = "1.0.0"
+CURRENT_VERSION = "1.0.1"
 
 # Base64 32x32 Alien Face PNG Icon (Valid PNG Byte Sequence)
 ALIEN_ICON_BASE64 = (
@@ -121,6 +121,161 @@ class DatabaseManager:
             print(f"Optimization Error: {e}")
 
 
+class InstructionsWindow(ctk.CTkToplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        self.title("CipherStream XDCC - Comprehensive User Guide & Instructions")
+        self.geometry("880x680")
+        self.minsize(780, 580)
+        self.attributes("-topmost", True)
+        self.parent.set_window_icon(self)
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+
+        self.tabview = ctk.CTkTabview(self)
+        self.tabview.pack(fill="both", expand=True, padx=10, pady=10)
+
+        t_xdcc = self.tabview.add("1. What is XDCC?")
+        t_nick = self.tabview.add("2. NickServ & Identity")
+        t_net = self.tabview.add("3. Network Config")
+        t_api = self.tabview.add("4. API Keys Setup")
+        t_guide = self.tabview.add("5. How to Use")
+
+        # --- Tab 1: XDCC Explanation ---
+        txt1 = ctk.CTkTextbox(t_xdcc, font=("Consolas", 12), wrap="word")
+        txt1.pack(fill="both", expand=True, padx=5, pady=5)
+        txt1.insert("1.0", (
+            "======================================================================\n"
+            "               UNDERSTANDING IRC & XDCC FILE SHARING                  \n"
+            "======================================================================\n\n"
+            "1. WHAT IS IRC?\n"
+            "   IRC (Internet Relay Chat) is one of the oldest internet chat protocols.\n"
+            "   Users connect to an IRC server (e.g. irc.abjects.net) and join channels\n"
+            "   (e.g. #moviegods or #mg-chat) to communicate in real time.\n\n"
+            "2. WHAT IS XDCC?\n"
+            "   XDCC stands for 'eXtended Direct Client-to-Client'. It is a file sharing\n"
+            "   protocol built on top of IRC.\n\n"
+            "   - Distribution Bots: Special automated chat users (bots) maintain large\n"
+            "     libraries of files arranged into 'Packs'.\n"
+            "   - Pack Numbers: Each file stored on a bot is assigned a unique number\n"
+            "     (for example: Pack #1042).\n"
+            "   - Direct Downloads: When you request a pack, the bot initiates a direct\n"
+            "     DCC socket transfer to sending the file directly to your PC without\n"
+            "     passing through intermediate web servers.\n\n"
+            "3. ADVANTAGES OF CIPHERSTREAM XDCC:\n"
+            "   - Multi-Server Support: Connect to multiple IRC networks simultaneously.\n"
+            "   - Automatic Indexing: Listens to announce channels and saves files into\n"
+            "     a local, fast SQLite search database.\n"
+            "   - Automated Queueing & Staggering: Staggers batch downloads cleanly so\n"
+            "     bots don't flood or reject your request.\n"
+            "   - Resume Capabilities: Automatic partial file detection and resume support.\n"
+        ))
+        txt1.configure(state="disabled")
+
+        # --- Tab 2: NickServ Explanation ---
+        txt2 = ctk.CTkTextbox(t_nick, font=("Consolas", 12), wrap="word")
+        txt2.pack(fill="both", expand=True, padx=5, pady=5)
+        txt2.insert("1.0", (
+            "======================================================================\n"
+            "              NICKSERV IDENTIFICATION & REGISTRATION                  \n"
+            "======================================================================\n\n"
+            "1. WHAT IS NICKSERV?\n"
+            "   NickServ is an automated service built into most major IRC networks that\n"
+            "   allows users to reserve and password-protect their nickname.\n\n"
+            "2. WHY DO I NEED IT FOR XDCC?\n"
+            "   Many IRC networks enforce security policies where distribution bots and\n"
+            "   chat channels will REJECT file transfers or ban users who are using\n"
+            "   unregistered or unauthenticated nicknames.\n\n"
+            "3. HOW CIPHERSTREAM AUTOMATES NICKSERV:\n"
+            "   - Registration: If a network requests NickServ registration, enter your\n"
+            "     desired password and email address in the 'Network & API Settings' window.\n"
+            "   - 30-Second Age Policy: Many IRC networks (like Abjects) enforce a rule\n"
+            "     requiring your nick to be active on the server for 30 seconds before\n"
+            "     accepting a registration. CipherStream handles this timer automatically!\n"
+            "   - Auto-Identify: Once registered, whenever you connect in the future,\n"
+            "     CipherStream silently logs you into NickServ in the background before\n"
+            "     joining channels or requesting files.\n"
+        ))
+        txt2.configure(state="disabled")
+
+        # --- Tab 3: Network Configuration ---
+        txt3 = ctk.CTkTextbox(t_net, font=("Consolas", 12), wrap="word")
+        txt3.pack(fill="both", expand=True, padx=5, pady=5)
+        txt3.insert("1.0", (
+            "======================================================================\n"
+            "                   NETWORK CONFIGURATION SETUP                        \n"
+            "======================================================================\n\n"
+            "Open the configuration window anytime by clicking 'Network & API Settings'\n"
+            "at the top of the main application window.\n\n"
+            "1. ADDING A NEW IRC SERVER:\n"
+            "   - Hostname: Enter the server address (e.g. irc.abjects.net).\n"
+            "   - Port: Standard plain IRC uses port 6667.\n"
+            "   - Click 'Add Server' to add it to your server roster.\n\n"
+            "2. CONFIGURING SERVER DETAILS:\n"
+            "   - Auto-Connect: Enable to automatically connect to this server when clicking 'Connect All'.\n"
+            "   - Nickname: Choose a unique handle (e.g. CipherUser_99).\n"
+            "   - NickServ Pass: Enter your NickServ password here.\n"
+            "   - NickServ Email: Enter your email address if registering a new nick.\n"
+            "   - Auto-Join Channels: Add channels where bots announce packs (e.g. #moviegods, #mg-chat).\n"
+            "   - Click 'Save Server Config' to apply changes.\n"
+        ))
+        txt3.configure(state="disabled")
+
+        # --- Tab 4: API Keys ---
+        txt4 = ctk.CTkTextbox(t_api, font=("Consolas", 12), wrap="word")
+        txt4.pack(fill="both", expand=True, padx=5, pady=5)
+        txt4.insert("1.0", (
+            "======================================================================\n"
+            "           OBTAINING FREE API KEYS FOR LIVE RELEASE PREVIEW           \n"
+            "======================================================================\n\n"
+            "CipherStream includes a Live Release Preview sidebar that automatically fetches\n"
+            "high-resolution posters, plot summaries, and release dates for movies, TV series, and PC games.\n\n"
+            "To enable live metadata preview, enter API keys in 'Network & API Settings' -> 'API Keys (Global)':\n\n"
+            "1. TMDB (The Movie Database) API KEY (For Movies & TV Shows):\n"
+            "   - Cost: 100% Free\n"
+            "   - Step 1: Go to https://www.themoviedb.org/ and sign up for a free account.\n"
+            "   - Step 2: Navigate to Account Settings -> API -> Request an API Key.\n"
+            "   - Step 3: Choose 'Developer' and fill in standard basic details.\n"
+            "   - Step 4: Copy your 'API Key (v3 auth)' and paste it into CipherStream.\n\n"
+            "2. RAWG API KEY (For PC Games & Updates):\n"
+            "   - Cost: 100% Free\n"
+            "   - Step 1: Go to https://rawg.io/apidocs and create a free user account.\n"
+            "   - Step 2: Click 'Get API Key'.\n"
+            "   - Step 3: Copy your personal API key string and paste it into CipherStream.\n\n"
+            "Note: TVMaze fallback metadata works automatically out of the box without an API key!"
+        ))
+        txt4.configure(state="disabled")
+
+        # --- Tab 5: How to Use ---
+        txt5 = ctk.CTkTextbox(t_guide, font=("Consolas", 12), wrap="word")
+        txt5.pack(fill="both", expand=True, padx=5, pady=5)
+        txt5.insert("1.0", (
+            "======================================================================\n"
+            "                       QUICK START USAGE GUIDE                        \n"
+            "======================================================================\n\n"
+            "STEP 1: CONNECT TO IRC\n"
+            "   Click 'Connect All' or select a server and click 'Connect Selected'.\n"
+            "   The client will connect, authenticate with NickServ, and join channels.\n\n"
+            "STEP 2: SEARCH THE INDEXED DATABASE\n"
+            "   - Type terms in the search bar (e.g. '1080p', 'Inception', 'Cyberpunk').\n"
+            "   - Use Resolution, Codec, or Year filters to narrow down results.\n"
+            "   - Single-click any item to preview poster artwork and plot summaries.\n\n"
+            "STEP 3: STAGE & DOWNLOAD\n"
+            "   - Double-click search results to push them to the 'Staging Queue'.\n"
+            "   - Click 'Check Bot Status' to see if the bot sharing the pack is currently online.\n"
+            "   - Click 'Download All (Push to Active)' to begin downloads.\n"
+            "   - Transfers are automatically staggered with a 4-second buffer to prevent bot bans.\n\n"
+            "STEP 4: MULTI-SERVER CHANNEL CHAT\n"
+            "   Click 'Channel Chat' to open a tabbed IRC client where you can talk in\n"
+            "   channels, double-click user nicknames to send PMs, or view operator counts.\n\n"
+            "STEP 5: AUTO-EXTRACT ARCHIVES\n"
+            "   Downloaded .zip or .tar archives automatically extract into subfolders in your download directory upon completion."
+        ))
+        txt5.configure(state="disabled")
+
+
 class LogWindow(ctk.CTkToplevel):
     def __init__(self, parent):
         super().__init__(parent)
@@ -184,7 +339,10 @@ class NetworkManagerWindow(ctk.CTkToplevel):
         left_frame = ctk.CTkFrame(self)
         left_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
         
-        self.srv_listbox = tk.Listbox(left_frame, bg="#2b2b2b", fg="white", font=("Consolas", 11), selectbackground="#1f538d", highlightthickness=0, borderwidth=0)
+        lb_bg = "#ffffff" if self.parent.config.get("theme", "Dark").lower() == "light" else "#2b2b2b"
+        lb_fg = "#000000" if self.parent.config.get("theme", "Dark").lower() == "light" else "white"
+        
+        self.srv_listbox = tk.Listbox(left_frame, bg=lb_bg, fg=lb_fg, font=("Consolas", 11), selectbackground="#1f538d", highlightthickness=0, borderwidth=0)
         self.srv_listbox.pack(side="top", fill="both", expand=True, padx=5, pady=5)
         self.srv_listbox.bind("<<ListboxSelect>>", self.on_server_select)
         
@@ -246,7 +404,7 @@ class NetworkManagerWindow(ctk.CTkToplevel):
         chan_container.grid(row=4, column=1, sticky="ew", padx=10, pady=5)
         
         self.chan_listbox = tk.Listbox(
-            chan_container, bg="#2b2b2b", fg="white", font=("Consolas", 11),
+            chan_container, bg=lb_bg, fg=lb_fg, font=("Consolas", 11),
             selectbackground="#1f538d", highlightthickness=0, borderwidth=0, selectmode=tk.EXTENDED, height=5
         )
         self.chan_listbox.pack(side="top", fill="both", expand=True)
@@ -450,8 +608,11 @@ class ChannelChatWindow(ctk.CTkToplevel):
 
         ctk.CTkLabel(nick_frame, text="Users", font=("Arial", 11, "bold")).grid(row=0, column=0, pady=2)
         
+        lb_bg = "#ffffff" if self.parent.config.get("theme", "Dark").lower() == "light" else "#2b2b2b"
+        lb_fg = "#000000" if self.parent.config.get("theme", "Dark").lower() == "light" else "white"
+
         self.nick_listbox = tk.Listbox(
-            nick_frame, bg="#2b2b2b", fg="white", selectbackground="#1f538d",
+            nick_frame, bg=lb_bg, fg=lb_fg, selectbackground="#1f538d",
             highlightthickness=0, borderwidth=0, font=("Consolas", 10)
         )
         nick_scroll = tk.Scrollbar(nick_frame, orient="vertical", command=self.nick_listbox.yview)
@@ -1069,7 +1230,7 @@ class IRCClient(asyncio.Protocol):
 class XDCCApp(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("Cipher Stream XDCC Multi Client - V1.0.0 BETA")
+        self.title("CipherStream XDCC Multi Client - V1.0.1 BETA")
         self.geometry("1400x900")
 
         self.current_poster_ref = None
@@ -1080,6 +1241,7 @@ class XDCCApp(ctk.CTk):
 
         self.config_file = "xdcc_config.json"
         self.config = {
+            "theme": "Dark",
             "servers": {
                 "irc.abjects.net:6667": {
                     "auto_connect": True,
@@ -1095,6 +1257,10 @@ class XDCCApp(ctk.CTk):
             }
         }
         self.load_config()
+
+        # Apply persistent theme mode
+        initial_theme = self.config.get("theme", "Dark")
+        ctk.set_appearance_mode(initial_theme)
 
         self.dl_path = r"\\WIN-RUBBERDUCK\wr-uhdd\IRC XDCC Downloader\PythonVersion"
         if not os.path.exists(self.dl_path):
@@ -1117,6 +1283,7 @@ class XDCCApp(ctk.CTk):
         
         self.chat_window = None
         self.net_mgr_win = None
+        self.instructions_win = None
         
         self.log_history = [] 
 
@@ -1124,7 +1291,7 @@ class XDCCApp(ctk.CTk):
         self.grid_rowconfigure(2, weight=3)
         self.grid_rowconfigure(3, weight=2)
 
-        # Top Control Frame (Global Nick & Register/Identify buttons completely removed)
+        # Top Control Frame
         top_frame = ctk.CTkFrame(self)
         top_frame.grid(row=0, column=0, sticky="ew", padx=10, pady=5)
 
@@ -1144,6 +1311,16 @@ class XDCCApp(ctk.CTk):
 
         self.chat_win_btn = ctk.CTkButton(top_frame, text="Channel Chat", width=100, fg_color="purple", command=self.open_chat_window)
         self.chat_win_btn.pack(side="left", padx=5)
+
+        # Instructions Button
+        self.instr_btn = ctk.CTkButton(top_frame, text="Instructions", width=100, fg_color="#0288d1", command=self.open_instructions)
+        self.instr_btn.pack(side="left", padx=5)
+
+        # Theme Switcher Selector
+        ctk.CTkLabel(top_frame, text="Theme:").pack(side="left", padx=(10, 2))
+        self.theme_combo = ctk.CTkComboBox(top_frame, values=["Dark", "Light", "System"], width=90, command=self.change_theme_mode)
+        self.theme_combo.pack(side="left", padx=2)
+        self.theme_combo.set(initial_theme)
 
         # Path Frame
         path_frame = ctk.CTkFrame(self)
@@ -1205,10 +1382,13 @@ class XDCCApp(ctk.CTk):
         self.search_btn = ctk.CTkButton(search_bar, text="Search", width=70, command=self.run_search)
         self.search_btn.pack(side="left", padx=5)
 
+        lb_bg = "#ffffff" if initial_theme.lower() == "light" else "#2b2b2b"
+        lb_fg = "#000000" if initial_theme.lower() == "light" else "white"
+
         ctk.CTkLabel(main_frame, text="Search Results:").grid(row=2, column=0, sticky="w", padx=5)
-        res_container = tk.Frame(main_frame, bg="#2b2b2b")
+        res_container = tk.Frame(main_frame, bg=lb_bg)
         res_container.grid(row=3, column=0, sticky="nsew", padx=5, pady=2)
-        self.results_list = tk.Listbox(res_container, bg="#2b2b2b", fg="white", selectbackground="#1f538d", highlightthickness=0, borderwidth=0, font=("Consolas", 10), selectmode=tk.EXTENDED, exportselection=False)
+        self.results_list = tk.Listbox(res_container, bg=lb_bg, fg=lb_fg, selectbackground="#1f538d", highlightthickness=0, borderwidth=0, font=("Consolas", 10), selectmode=tk.EXTENDED, exportselection=False)
         self.results_list.bind("<<ListboxSelect>>", self.on_search_select_event)
         self.results_list.bind("<Double-Button-1>", lambda event: self.add_to_queue())
         res_scroll = tk.Scrollbar(res_container, orient="vertical", command=self.results_list.yview)
@@ -1222,9 +1402,9 @@ class XDCCApp(ctk.CTk):
         self.add_q_btn.pack(side="left", padx=2)
 
         ctk.CTkLabel(main_frame, text="Staging Queue (Pending):").grid(row=5, column=0, sticky="w", padx=5)
-        q_container = tk.Frame(main_frame, bg="#2b2b2b")
+        q_container = tk.Frame(main_frame, bg=lb_bg)
         q_container.grid(row=6, column=0, sticky="nsew", padx=5, pady=2)
-        self.queue_list = tk.Listbox(q_container, bg="#2b2b2b", fg="white", selectbackground="#1f538d", highlightthickness=0, borderwidth=0, font=("Consolas", 10), selectmode=tk.EXTENDED, exportselection=False)
+        self.queue_list = tk.Listbox(q_container, bg=lb_bg, fg=lb_fg, selectbackground="#1f538d", highlightthickness=0, borderwidth=0, font=("Consolas", 10), selectmode=tk.EXTENDED, exportselection=False)
         self.queue_list.bind("<Double-Button-1>", lambda event: self.remove_from_queue())
         q_scroll = tk.Scrollbar(q_container, orient="vertical", command=self.queue_list.yview)
         self.queue_list.configure(yscrollcommand=q_scroll.set)
@@ -1317,6 +1497,28 @@ class XDCCApp(ctk.CTk):
         
         self.check_for_updates()
 
+    def change_theme_mode(self, new_mode):
+        ctk.set_appearance_mode(new_mode)
+        self.config["theme"] = new_mode
+        self.save_config()
+
+        lb_bg = "#ffffff" if new_mode.lower() == "light" else "#2b2b2b"
+        lb_fg = "#000000" if new_mode.lower() == "light" else "white"
+
+        for lb in [self.results_list, self.queue_list]:
+            try:
+                lb.configure(bg=lb_bg, fg=lb_fg)
+            except Exception:
+                pass
+
+        self.log(f"[System] UI appearance theme set to: {new_mode}")
+
+    def open_instructions(self):
+        if self.instructions_win is None or not self.instructions_win.winfo_exists():
+            self.instructions_win = InstructionsWindow(self)
+        else:
+            self.instructions_win.focus()
+
     def check_for_updates(self):
         def _check():
             try:
@@ -1407,6 +1609,9 @@ del "%~f0"
                     old_chans = data.get("channels", {})
                     default_chans = [c for c, j in old_chans.items() if j] if old_chans else ["#mg-chat", "#moviegods"]
                     
+                    if "theme" not in data:
+                        data["theme"] = "Dark"
+
                     if "servers" in data:
                         if isinstance(data["servers"], list):
                             srv_dict = {}
