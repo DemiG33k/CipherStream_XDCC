@@ -4,7 +4,7 @@
 
 If you are new to IRC and file-sharing protocols, understanding these foundational concepts will make navigating the application effortless:
 
-* **IRC (Internet Relay Chat):** A classic, text-based communication system divided into different servers (networks) and chat rooms (called "channels", e.g., `#moviegods`).
+* **IRC (Internet Relay Chat):** A classic, text-based communication system divided into different servers (networks) and chat rooms (called "channels", e.g., `#channel`).
 * **XDCC:** A popular file-sharing system used on IRC networks. Instead of downloading files from a traditional website, you interact with automated computer programs called **bots** that host files and transfer them directly to you.
 * **NickServ:** Because IRC does not have traditional password-protected user accounts built into its core protocol, networks use a security helper service called **NickServ**. NickServ allows you to "register" your chosen nickname with a password so nobody else can steal or impersonate your screen name while you are offline.
 * **Important Note on Verification:** Some strict IRC networks require email verification. When registering your nickname for the first time, NickServ may email you a confirmation link or verification code that you must reply with in order to complete your registration.
@@ -24,7 +24,7 @@ Before you can search for files or chat, you must configure your server connecti
 * **Nickname:** Enter the unique screen name you want to use on the network.
 * **NickServ Pass:** Create a secure password to lock and protect your nickname.
 * **NickServ Email:** Enter your active email address. *(Keep an eye on your inbox in case the server sends a verification code or token).*
-* **Auto-Join Channels:** Add the chat channels you want the app to enter automatically upon connection (e.g., `#moviegods`).
+* **Auto-Join Channels:** Add the chat channels you want the app to enter automatically upon connection.
 
 
 4. Click the green **Save Server Config** button at the bottom.
