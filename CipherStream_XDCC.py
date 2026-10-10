@@ -121,6 +121,73 @@ class DatabaseManager:
             print(f"Optimization Error: {e}")
 
 
+class TermsAgreementWindow(ctk.CTkToplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        self.title("Terms of Use and Disclaimer - CipherStream XDCC")
+        self.geometry("750x620")
+        self.minsize(650, 500)
+        self.attributes("-topmost", True)
+        self.parent.set_window_icon(self)
+        self.protocol("WM_DELETE_WINDOW", self.on_decline)
+        self.grab_set()
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+
+        ctk.CTkLabel(self, text="Terms of Use and Disclaimer of Liability", font=("Arial", 16, "bold"), text_color="orange").grid(row=0, column=0, pady=(15, 5))
+
+        txt_box = ctk.CTkTextbox(self, font=("Consolas", 11), wrap="word")
+        txt_box.grid(row=1, column=0, sticky="nsew", padx=20, pady=10)
+        txt_box.insert("1.0", (
+            "TERMS OF USE AND DISCLAIMER OF LIABILITY\n\n"
+            "PLEASE READ THESE TERMS OF USE CAREFULLY BEFORE USING CIPHERSTREAM XDCC (THE 'SOFTWARE'). "
+            "BY DOWNLOADING, INSTALLING, OR OTHERWISE USING THE SOFTWARE, YOU ACKNOWLEDGE THAT YOU HAVE READ, "
+            "UNDERSTOOD, AND AGREED TO BE BOUND BY THESE TERMS.\n\n"
+            "1. ACCEPTANCE OF TERMS\n"
+            "This software is provided as an open-source automation utility for managing IRC and Direct Client-to-Client (DCC) file protocols. "
+            "If you do not agree to every clause outlined in this disclaimer, you must immediately cease use of the Software and remove all associated files.\n\n"
+            "2. DISCLAIMER OF WARRANTY ('AS IS')\n"
+            "THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, "
+            "FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS, DEVELOPERS, OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, "
+            "OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS.\n\n"
+            "3. ASSUMPTION OF RISK\n"
+            "USE OF THIS TOOL IS STRICTLY AT YOUR OWN RISK. The user acknowledges full responsibility for any actions taken using the Software, including network "
+            "connections, data transmission, and file storage. The developers exercise no control over external IRC networks, third-party distribution bots, or files transferred.\n\n"
+            "4. PROHIBITED USES AND LAWFUL COMPLIANCE\n"
+            "The Software is designed exclusively for lawful data management and protocol interaction. You expressly agree NOT to use the Software for:\n"
+            "• The acquisition, distribution, or handling of illegal content, pirated material, or digital property for which you do not hold legal ownership, distribution rights, or explicit authorization.\n"
+            "• Any activity that violates local, national, or international laws, statutes, or regulations.\n\n"
+            "The user assumes total and sole legal responsibility for ensuring that any content accessed, indexed, or downloaded complies fully with applicable copyright laws.\n\n"
+            "5. LIMITATION OF LIABILITY AND INDEMNIFICATION\n"
+            "To the maximum extent permitted by applicable law, the owner, creator, and maintainers of the Software shall NOT be held liable for any direct, indirect, incidental, "
+            "special, exemplary, or consequential damages (including loss of data, system failure, legal penalties, or copyright claims) resulting from the usage or misuse of the Software.\n\n"
+            "You agree to indemnify, defend, and hold harmless the creators and maintainers of the Software from and against any and all claims, liabilities, damages, losses, or expenses "
+            "arising out of your violation of these Terms or your unlawful use of the Software."
+        ))
+        txt_box.configure(state="disabled")
+
+        btn_frame = ctk.CTkFrame(self, fg_color="transparent")
+        btn_frame.grid(row=2, column=0, sticky="ew", padx=20, pady=(0, 20))
+
+        accept_btn = ctk.CTkButton(btn_frame, text="I Accept & Agree", fg_color="green", width=160, height=35, command=self.on_accept)
+        accept_btn.pack(side="right", padx=5)
+
+        decline_btn = ctk.CTkButton(btn_frame, text="Decline & Exit", fg_color="firebrick", width=140, height=35, command=self.on_decline)
+        decline_btn.pack(side="right", padx=5)
+
+    def on_accept(self):
+        self.parent.config["terms_accepted"] = True
+        self.parent.save_config()
+        self.parent.log("[System] Terms and Conditions accepted by user.")
+        self.destroy()
+
+    def on_decline(self):
+        messagebox.showwarning("Terms Declined", "You must accept the Terms and Conditions to use CipherStream XDCC.", parent=self)
+        self.parent.destroy()
+
+
 class InstructionsWindow(ctk.CTkToplevel):
     def __init__(self, parent):
         super().__init__(parent)
@@ -1241,6 +1308,7 @@ class XDCCApp(ctk.CTk):
         self.config_file = "xdcc_config.json"
         self.config = {
             "theme": "Dark",
+            "terms_accepted": False,
             "servers": {},
             "api_keys": {
                 "tmdb": "",
@@ -1248,6 +1316,10 @@ class XDCCApp(ctk.CTk):
             }
         }
         self.load_config()
+
+        # Check terms acceptance on first launch
+        if not self.config.get("terms_accepted", False):
+            self.after(300, self.open_terms_window)
 
         # Apply persistent theme mode
         initial_theme = self.config.get("theme", "Dark")
@@ -1275,6 +1347,7 @@ class XDCCApp(ctk.CTk):
         self.chat_window = None
         self.net_mgr_win = None
         self.instructions_win = None
+        self.terms_win = None
         
         self.log_history = [] 
 
@@ -1491,6 +1564,12 @@ class XDCCApp(ctk.CTk):
         
         self.check_for_updates()
 
+    def open_terms_window(self):
+        if self.terms_win is None or not self.terms_win.winfo_exists():
+            self.terms_win = TermsAgreementWindow(self)
+        else:
+            self.terms_win.focus()
+
     def change_theme_mode(self, new_mode):
         ctk.set_appearance_mode(new_mode)
         self.config["theme"] = new_mode
@@ -1603,6 +1682,9 @@ del "%~f0"
                     
                     if "theme" not in data:
                         data["theme"] = "Dark"
+
+                    if "terms_accepted" not in data:
+                        data["terms_accepted"] = False
 
                     if "servers" in data:
                         if isinstance(data["servers"], list):
