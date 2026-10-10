@@ -152,8 +152,8 @@ class InstructionsWindow(ctk.CTkToplevel):
             "======================================================================\n\n"
             "1. WHAT IS IRC?\n"
             "   IRC (Internet Relay Chat) is one of the oldest internet chat protocols.\n"
-            "   Users connect to an IRC server (e.g. irc.abjects.net) and join channels\n"
-            "   (e.g. #moviegods or #mg-chat) to communicate in real time.\n\n"
+            "   Users connect to an IRC server (e.g. irc.server.net) and join channels\n"
+            "   (e.g. #channel) to communicate in real time.\n\n"
             "2. WHAT IS XDCC?\n"
             "   XDCC stands for 'eXtended Direct Client-to-Client'. It is a file sharing\n"
             "   protocol built on top of IRC.\n\n"
@@ -162,7 +162,7 @@ class InstructionsWindow(ctk.CTkToplevel):
             "   - Pack Numbers: Each file stored on a bot is assigned a unique number\n"
             "     (for example: Pack #1042).\n"
             "   - Direct Downloads: When you request a pack, the bot initiates a direct\n"
-            "     DCC socket transfer to sending the file directly to your PC without\n"
+            "     DCC socket transfer to send the file directly to your PC without\n"
             "     passing through intermediate web servers.\n\n"
             "3. ADVANTAGES OF CIPHERSTREAM XDCC:\n"
             "   - Multi-Server Support: Connect to multiple IRC networks simultaneously.\n"
@@ -191,9 +191,8 @@ class InstructionsWindow(ctk.CTkToplevel):
             "3. HOW CIPHERSTREAM AUTOMATES NICKSERV:\n"
             "   - Registration: If a network requests NickServ registration, enter your\n"
             "     desired password and email address in the 'Network & API Settings' window.\n"
-            "   - 30-Second Age Policy: Many IRC networks (like Abjects) enforce a rule\n"
-            "     requiring your nick to be active on the server for 30 seconds before\n"
-            "     accepting a registration. CipherStream handles this timer automatically!\n"
+            "   - Nick Age Policies: Many IRC networks enforce a rule requiring your\n"
+            "     nick to be active for a set duration before accepting registration.\n"
             "   - Auto-Identify: Once registered, whenever you connect in the future,\n"
             "     CipherStream silently logs you into NickServ in the background before\n"
             "     joining channels or requesting files.\n"
@@ -210,15 +209,15 @@ class InstructionsWindow(ctk.CTkToplevel):
             "Open the configuration window anytime by clicking 'Network & API Settings'\n"
             "at the top of the main application window.\n\n"
             "1. ADDING A NEW IRC SERVER:\n"
-            "   - Hostname: Enter the server address (e.g. irc.abjects.net).\n"
+            "   - Hostname: Enter the server address (e.g. irc.server.net).\n"
             "   - Port: Standard plain IRC uses port 6667.\n"
             "   - Click 'Add Server' to add it to your server roster.\n\n"
             "2. CONFIGURING SERVER DETAILS:\n"
             "   - Auto-Connect: Enable to automatically connect to this server when clicking 'Connect All'.\n"
-            "   - Nickname: Choose a unique handle (e.g. CipherUser_99).\n"
+            "   - Nickname: Choose a unique handle.\n"
             "   - NickServ Pass: Enter your NickServ password here.\n"
             "   - NickServ Email: Enter your email address if registering a new nick.\n"
-            "   - Auto-Join Channels: Add channels where bots announce packs (e.g. #moviegods, #mg-chat).\n"
+            "   - Auto-Join Channels: Add channels where bots announce packs (e.g. #channel).\n"
             "   - Click 'Save Server Config' to apply changes.\n"
         ))
         txt3.configure(state="disabled")
@@ -259,7 +258,7 @@ class InstructionsWindow(ctk.CTkToplevel):
             "   Click 'Connect All' or select a server and click 'Connect Selected'.\n"
             "   The client will connect, authenticate with NickServ, and join channels.\n\n"
             "STEP 2: SEARCH THE INDEXED DATABASE\n"
-            "   - Type terms in the search bar (e.g. '1080p', 'Inception', 'Cyberpunk').\n"
+            "   - Type terms in the search bar (e.g. '1080p', 'Inception').\n"
             "   - Use Resolution, Codec, or Year filters to narrow down results.\n"
             "   - Single-click any item to preview poster artwork and plot summaries.\n\n"
             "STEP 3: STAGE & DOWNLOAD\n"
@@ -487,7 +486,7 @@ class NetworkManagerWindow(ctk.CTkToplevel):
                 new_srv = f"{new_srv}:{port}"
             if new_srv not in self.parent.config["servers"]:
                 self.parent.config["servers"][new_srv] = {
-                    "auto_connect": True, "nick": "", "nickserv_pass": "", "nickserv_email": "", "channels": ["#moviegods"]
+                    "auto_connect": True, "nick": "", "nickserv_pass": "", "nickserv_email": "", "channels": []
                 }
                 self.parent.save_config()
                 self.parent.update_server_combos()
@@ -1242,15 +1241,7 @@ class XDCCApp(ctk.CTk):
         self.config_file = "xdcc_config.json"
         self.config = {
             "theme": "Dark",
-            "servers": {
-                "irc.abjects.net:6667": {
-                    "auto_connect": True,
-                    "nick": "XDCCUser",
-                    "nickserv_pass": "",
-                    "nickserv_email": "",
-                    "channels": ["#mg-chat", "#moviegods"]
-                }
-            },
+            "servers": {},
             "api_keys": {
                 "tmdb": "",
                 "rawg": ""
@@ -1295,10 +1286,13 @@ class XDCCApp(ctk.CTk):
         top_frame = ctk.CTkFrame(self)
         top_frame.grid(row=0, column=0, sticky="ew", padx=10, pady=5)
 
-        self.server_combo = ctk.CTkComboBox(top_frame, values=list(self.config["servers"].keys()), width=170)
+        server_keys = list(self.config["servers"].keys())
+        self.server_combo = ctk.CTkComboBox(top_frame, values=server_keys if server_keys else [""], width=170)
         self.server_combo.pack(side="left", padx=2)
-        if self.config["servers"]:
-            self.server_combo.set(list(self.config["servers"].keys())[0])
+        if server_keys:
+            self.server_combo.set(server_keys[0])
+        else:
+            self.server_combo.set("")
 
         self.conn_selected_btn = ctk.CTkButton(top_frame, text="Connect Selected", width=120, fg_color="#2e7d32", command=self.connect_selected_server)
         self.conn_selected_btn.pack(side="left", padx=2)
@@ -1606,8 +1600,6 @@ del "%~f0"
             try:
                 with open(self.config_file, "r") as f:
                     data = json.load(f)
-                    old_chans = data.get("channels", {})
-                    default_chans = [c for c, j in old_chans.items() if j] if old_chans else ["#mg-chat", "#moviegods"]
                     
                     if "theme" not in data:
                         data["theme"] = "Dark"
@@ -1616,12 +1608,12 @@ del "%~f0"
                         if isinstance(data["servers"], list):
                             srv_dict = {}
                             for s in data["servers"]:
-                                srv_dict[s] = {"auto_connect": True, "nick": "", "nickserv_pass": "", "nickserv_email": "", "channels": default_chans.copy()}
+                                srv_dict[s] = {"auto_connect": True, "nick": "", "nickserv_pass": "", "nickserv_email": "", "channels": []}
                             data["servers"] = srv_dict
                         elif isinstance(data["servers"], dict):
                             for srv, srv_data in data["servers"].items():
                                 if "channels" not in srv_data:
-                                    srv_data["channels"] = default_chans.copy()
+                                    srv_data["channels"] = []
                                 if "nick" not in srv_data:
                                     srv_data["nick"] = ""
                                 if "nickserv_pass" not in srv_data:
@@ -1650,6 +1642,9 @@ del "%~f0"
         srv_keys = list(self.config["servers"].keys())
         if srv_keys:
             self.server_combo.configure(values=srv_keys)
+        else:
+            self.server_combo.configure(values=[""])
+            self.server_combo.set("")
 
         db_servers = self.db.get_servers()
         combined_srvs = sorted(list(set(["All Servers"] + srv_keys + db_servers)))
